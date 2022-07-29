@@ -1,0 +1,12 @@
+{
+  "name": "davi-api",
+  "version": "1.0.0",
+  "description": "Internal API DAVI",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^2.48.0",
+    "serverless-plugin-datadog": "^5.2.0",
+    "bluebird": "^3.7.2"
+  }
+}

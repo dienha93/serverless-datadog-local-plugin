@@ -1,0 +1,104 @@
+service: datadog-demo-app
+
+provider:
+  environment:
+    DD_FLUSH_TO_LOG: true
+  lambdaHashingVersion: 20201221
+  name: aws
+  region: ${opt:region, 'ap-southeast-1'}
+  runtime: python3.9
+  versionFunctions: false
+
+custom:
+  datadog:
+    addExtension: false
+    addLayers: true
+    apiKeySecretArn:
+      Ref: ApiKeySecretArn
+    captureLambdaPayload: false
+    datadog: null
+    enableDDLogs: true
+    enableDDTracing: true
+    enableSourceCodeIntegration: false
+    enableXrayTracing: false
+    enabled: true
+    env:
+      Ref: Environment
+    exclude:
+    - hello1
+    forwarderArn:
+      Ref: ForwarderArn
+    integrationTesting: true
+    logLevel: warn
+    site: datadoghq.com
+    version:
+      Ref: Version
+  logRetentionInDays:
+    Ref: LogRetentionInDays
+functions:
+  hello:
+    description: Demo Datadog Lambda Serverless
+    handler: src/handler.hello
+    memorySize: 512
+    name: datadog-demo-app
+    runtime: python3.9
+    timeout: 60
+
+package:
+  excludeDevDependencies: false
+  individually: true
+  patterns:
+  - '!node_modules'
+  - '!.serverless/requirements'
+  - '!${opt:package, ''.serverless''}'
+  - '!configs'
+  - '!*.yml*'
+  - '!*.json'
+  - '!*.sh'
+  - lib
+  - '*.py'
+
+resources:
+  Conditions:
+    UseDataDog:
+      Fn::Equals:
+      - Ref: UseDataDog
+      - 'Yes'
+  Parameters:
+    Environment:
+      Type: 'String'
+    ApiKeySecretArn:
+      Type: 'String'
+    Version:
+      Type: 'String'
+    
+    DdExtension:
+      AllowedValues:
+      - true
+      - false
+      Default: false
+      Type: String
+    ForwarderArn:
+      Default: ''
+      Type: String
+    LogRetentionInDays:
+      AllowedValues:
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      Default: 7
+      Type: String
+    UseDataDog:
+      AllowedValues:
+      - 'Yes'
+      - 'No'
+      Default: 'No'
+      Type: String
+
+plugins:
+  localPath: .serverless_plugins
+  modules:
+  - serverless-plugin-datadog
+  - serverless-local-plugin
